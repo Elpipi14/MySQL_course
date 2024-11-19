@@ -292,45 +292,7 @@ SELECT * FROM facturacion_total_por_mes();
 --------------------------------------------------------------------------------
 ---------------------------- Stored Procedure ----------------------------------
 
--- 1. Stored Procedure: sp_agregar_reserva
--- Descripción:
--- Este procedimiento almacena una nueva reserva para un usuario en una clase específica. También actualiza el historial de reservas automáticamente.
-
--- Objetivo:
--- Automatizar el proceso de agregar una reserva para un usuario.
--- Garantizar la consistencia al registrar simultáneamente la reserva y el historial.
--- Beneficio:
--- Simplifica la inserción de reservas desde la aplicación o interfaz de usuario.
--- Reduce errores al manejar automáticamente las dependencias entre reservas y historial_reservas.
--- Tablas Utilizadas:
--- reservas
--- historial_reservas
-
-DELIMITER $$
-CREATE PROCEDURE sp_agregar_reserva(
-    IN p_id_usuario INT,
-    IN p_id_horario INT,
-    IN p_fecha_reserva DATETIME,
-    IN p_fecha_clase DATETIME
-)
-BEGIN
-    -- Insertar nueva reserva
-    INSERT INTO reservas (id_usuario, id_horario, fecha_reserva, fecha_clase, estado_reserva)
-    VALUES (p_id_usuario, p_id_horario, p_fecha_reserva, p_fecha_clase, 'activa');
-
-    -- Insertar en historial de reservas
-    INSERT INTO historial_reservas (id_usuario, id_horario, fecha_reserva)
-    VALUES (p_id_usuario, p_id_horario, p_fecha_reserva);
-END$$
-
-DELIMITER ;
-
--- Uso del Procedimiento:
-CALL sp_agregar_reserva(1, 4, NOW(), '2024-12-10 08:00:00');
-
-------------------------------------------------------------------------------------
-
--- 2. Stored Procedure: sp_generar_factura
+-- 1. Stored Procedure: sp_generar_factura
 -- Descripción:
 -- Genera una factura para un pago específico, calculando las fechas de inicio y fin de la membresía asociada.
 
@@ -373,7 +335,7 @@ DELIMITER ;
 
 ------------------------------------------------------------------------------------
 
--- 3. Stored Procedure: sp_reporte_facturacion_mensual
+-- 2. Stored Procedure: sp_reporte_facturacion_mensual
 -- Descripción:
 -- Genera un reporte de la facturación total por mes, mostrando el mes, el número de facturas emitidas y el monto total.
 
@@ -404,22 +366,16 @@ DELIMITER ;
 
 -- Uso del Procedimiento:
 CALL sp_reporte_facturacion_mensual();
-Resumen de Stored Procedures
-sp_agregar_reserva:
 
 ------------------   Resumen de los Stored Procedure   ---------------------------
 
--- Objetivo: Insertar una nueva reserva y actualizar el historial de reservas.
--- Beneficio: Automatiza el proceso de reservas, reduciendo errores.
--- Tablas: reservas, historial_reservas.
 -- sp_generar_factura:
-
--- Objetivo: Generar una factura para un pago específico.
--- Beneficio: Asegura la consistencia en la generación de facturas.
--- Tablas: facturacion, pagos.
+    -- Objetivo: Generar una factura para un pago específico.
+    -- Beneficio: Asegura la consistencia en la generación de facturas.
+    -- Tablas: facturacion, pagos.
+    
 -- sp_reporte_facturacion_mensual:
-
--- Objetivo: Proveer un resumen mensual de facturación.
--- Beneficio: Simplifica la generación de reportes financieros.
--- Tablas: facturacion, pagos.
+    -- Objetivo: Proveer un resumen mensual de facturación.
+    -- Beneficio: Simplifica la generación de reportes financieros.
+    -- Tablas: facturacion, pagos.
 
