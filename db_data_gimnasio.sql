@@ -63,7 +63,7 @@ VALUES
 (5, 'Jueves', '19:00:00', '20:00:00'),
 (5, 'Domingo', '10:00:00', '11:00:00');
 
---(Aplicar los triggers para una simulacion pagos y reservas despues insertas datos asi se acutualiza los trigger y guarda en sus historiales)----
+--(Aplicar los triggers para una simulacion pagos y reservas en el archivo db_script_vfst.sql. Despues insertas datos asi se acutualiza los trigger y guarda en sus historiales)----
 
 -- Inserción de datos en la tabla Reservas
 INSERT INTO reservas (id_horario, id_usuario, fecha_reserva, fecha_clase)
