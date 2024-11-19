@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
 --------------------------- Listado de Vistas ----------------------------------
+
 --  1. Vista: vista_usuarios_activos
 --  Descripción:
 --  Esta vista muestra una lista de usuarios activos junto con su tipo de membresía, el número de pagos realizados y la última fecha de pago. Es útil para monitorear a los clientes activos en el gimnasio.
@@ -216,7 +217,7 @@ DELIMITER ;
 SELECT * FROM facturacion_total_por_mes();
 
 --------------------------------------------------------------------------------
------------------------------Stored Procedure-----------------------------------
+---------------------------- Stored Procedure ----------------------------------
 
 -- 1. Stored Procedure: sp_agregar_reserva
 -- Descripción:
@@ -351,7 +352,7 @@ sp_agregar_reserva:
 -- Tablas: facturacion, pagos.
     
 ------------------------------------------------------------------------------------
--------------------------------Trigger----------------------------------------------
+------------------------------ Trigger ---------------------------------------------
 
 --Facturacion cuando el cliente ahce el pago.
 DELIMITER $$
