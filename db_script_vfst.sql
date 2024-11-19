@@ -349,4 +349,42 @@ sp_agregar_reserva:
 -- Objetivo: Proveer un resumen mensual de facturación.
 -- Beneficio: Simplifica la generación de reportes financieros.
 -- Tablas: facturacion, pagos.
+    
 ------------------------------------------------------------------------------------
+-------------------------------Trigger----------------------------------------------
+
+--Facturacion cuando el cliente ahce el pago.
+DELIMITER $$
+
+CREATE TRIGGER generar_factura
+AFTER INSERT ON pagos
+FOR EACH ROW
+BEGIN
+    DECLARE fecha_inicio DATE;
+    DECLARE fecha_fin DATE;
+
+    -- La membresía dura un mes a partir de la fecha del pago
+    SET fecha_inicio = DATE(NEW.fecha_pago); -- Fecha del pago
+    SET fecha_fin = DATE_ADD(fecha_inicio, INTERVAL 1 MONTH); -- Suma un mes
+
+    -- Inserta la nueva factura en la tabla facturacion
+    INSERT INTO facturacion (id_pago, fecha_inicio, fecha_fin, fecha_generacion)
+    VALUES (NEW.id_pago, fecha_inicio, fecha_fin, CURDATE());
+END$$
+
+DELIMITER ;
+
+
+--Registra el historial cuando el cliente hace la reserva
+DELIMITER $$
+
+CREATE TRIGGER registrar_historial_reserva
+AFTER INSERT ON reservas
+FOR EACH ROW
+BEGIN
+    -- Inserta automáticamente en historial_reservas usando los datos de la nueva reserva
+    INSERT INTO historial_reservas (id_usuario, id_horario, fecha_reserva)
+    VALUES (NEW.id_usuario, NEW.id_horario, NEW.fecha_reserva);
+END$$
+
+DELIMITER ;
