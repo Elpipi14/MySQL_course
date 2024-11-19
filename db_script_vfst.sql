@@ -1,41 +1,66 @@
 ------------------------------------------------------------------------------------
 ------------------------------ Trigger ---------------------------------------------
 
---Facturacion cuando el cliente ahce el pago.
+--Facturacion cuando el cliente cuando hace el pago:
+
+    -- Funcionalidad:
+        -- Se ejecuta después de que se inserta un nuevo registro en la tabla pagos.
+        -- Calcula automáticamente las fechas de inicio y fin de la membresía en función de la fecha del pago (fecha_pago).
+        -- Inserta un nuevo registro en la tabla facturacion con los detalles del pago y las fechas generadas.
+
+    -- Objetivos:
+        -- Automatizar la generación de facturas asociadas a los pagos realizados por los clientes.
+        -- Reducir la intervención manual para garantizar que cada pago registrado tenga su correspondiente factura.
+        -- Mantener un historial organizado de facturación para referencia y auditoría.
+
+    -- Tablas involucradas:
+        -- Tabla pagos: Contiene la información de los pagos realizados por los clientes (por ejemplo, id_pago, fecha_pago, monto, etc.).
+        -- Tabla facturacion: Almacena detalles de las facturas, como el identificador del pago (id_pago), las fechas de vigencia (fecha_inicio y fecha_fin) y la fecha de generación de la factura.
+
 DELIMITER $$
-
-CREATE TRIGGER generar_factura
-AFTER INSERT ON pagos
-FOR EACH ROW
-BEGIN
-    DECLARE fecha_inicio DATE;
-    DECLARE fecha_fin DATE;
-
-    -- La membresía dura un mes a partir de la fecha del pago
-    SET fecha_inicio = DATE(NEW.fecha_pago); -- Fecha del pago
-    SET fecha_fin = DATE_ADD(fecha_inicio, INTERVAL 1 MONTH); -- Suma un mes
-
-    -- Inserta la nueva factura en la tabla facturacion
-    INSERT INTO facturacion (id_pago, fecha_inicio, fecha_fin, fecha_generacion)
-    VALUES (NEW.id_pago, fecha_inicio, fecha_fin, CURDATE());
-END$$
-
+    CREATE TRIGGER generar_factura
+    AFTER INSERT ON pagos
+    FOR EACH ROW
+    BEGIN
+        DECLARE fecha_inicio DATE;
+        DECLARE fecha_fin DATE;
+    
+        -- La membresía dura un mes a partir de la fecha del pago
+        SET fecha_inicio = DATE(NEW.fecha_pago); -- Fecha del pago
+        SET fecha_fin = DATE_ADD(fecha_inicio, INTERVAL 1 MONTH); -- Suma un mes
+    
+        -- Inserta la nueva factura en la tabla facturacion
+        INSERT INTO facturacion (id_pago, fecha_inicio, fecha_fin, fecha_generacion)
+        VALUES (NEW.id_pago, fecha_inicio, fecha_fin, CURDATE());
+    END$$
 DELIMITER ;
 
+------------------------------------------------------------------------------------
 
---Registra el historial cuando el cliente hace la reserva
+--Registra el historial cuando el cliente hace la reserva:
+
+    -- Funcionalidad:
+        -- Se ejecuta después de que se inserta un nuevo registro en la tabla reservas.
+        -- Registra automáticamente un historial de la reserva en la tabla historial_reservas, replicando los datos clave de la reserva: usuario (id_usuario), horario (id_horario) y la fecha de la reserva (fecha_reserva).
+    -- Objetivos
+        -- Mantener un registro histórico de las reservas realizadas por los usuarios.
+        -- Facilitar el seguimiento, consultas y auditorías de las actividades de reserva.
+        -- Garantizar la integridad de los datos históricos en caso de que se eliminen o modifiquen registros en la tabla principal reservas.
+    
+    -- Tablas involucradas:
+        -- Tabla reservas: Contiene la información principal de las reservas realizadas (por ejemplo, usuario, horario, fecha, etc.).
+        -- Tabla historial_reservas: Almacena el historial de reservas, reflejando datos clave de la tabla reservas.
+
 DELIMITER $$
-
-CREATE TRIGGER registrar_historial_reserva
-AFTER INSERT ON reservas
-FOR EACH ROW
-BEGIN
-    -- Inserta automáticamente en historial_reservas usando los datos de la nueva reserva
-    INSERT INTO historial_reservas (id_usuario, id_horario, fecha_reserva)
-    VALUES (NEW.id_usuario, NEW.id_horario, NEW.fecha_reserva);
-END$$
-
-DELIMITER ;
+    CREATE TRIGGER registrar_historial_reserva
+    AFTER INSERT ON reservas
+    FOR EACH ROW
+    BEGIN
+        -- Inserta automáticamente en historial_reservas usando los datos de la nueva reserva
+        INSERT INTO historial_reservas (id_usuario, id_horario, fecha_reserva)
+        VALUES (NEW.id_usuario, NEW.id_horario, NEW.fecha_reserva);
+    END$$
+DELIMITER;
 
 --------------------------------------------------------------------------------
 --------------------------- Listado de Vistas ----------------------------------
