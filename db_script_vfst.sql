@@ -1,3 +1,42 @@
+    ------------------------------------------------------------------------------------
+------------------------------ Trigger ---------------------------------------------
+
+--Facturacion cuando el cliente ahce el pago.
+DELIMITER $$
+
+CREATE TRIGGER generar_factura
+AFTER INSERT ON pagos
+FOR EACH ROW
+BEGIN
+    DECLARE fecha_inicio DATE;
+    DECLARE fecha_fin DATE;
+
+    -- La membresía dura un mes a partir de la fecha del pago
+    SET fecha_inicio = DATE(NEW.fecha_pago); -- Fecha del pago
+    SET fecha_fin = DATE_ADD(fecha_inicio, INTERVAL 1 MONTH); -- Suma un mes
+
+    -- Inserta la nueva factura en la tabla facturacion
+    INSERT INTO facturacion (id_pago, fecha_inicio, fecha_fin, fecha_generacion)
+    VALUES (NEW.id_pago, fecha_inicio, fecha_fin, CURDATE());
+END$$
+
+DELIMITER ;
+
+
+--Registra el historial cuando el cliente hace la reserva
+DELIMITER $$
+
+CREATE TRIGGER registrar_historial_reserva
+AFTER INSERT ON reservas
+FOR EACH ROW
+BEGIN
+    -- Inserta automáticamente en historial_reservas usando los datos de la nueva reserva
+    INSERT INTO historial_reservas (id_usuario, id_horario, fecha_reserva)
+    VALUES (NEW.id_usuario, NEW.id_horario, NEW.fecha_reserva);
+END$$
+
+DELIMITER ;
+
 --------------------------------------------------------------------------------
 --------------------------- Listado de Vistas ----------------------------------
 
@@ -23,6 +62,7 @@ LEFT JOIN membresias m ON u.id_membresia = m.id_membresia
 LEFT JOIN pagos p ON u.id_usuario = p.id_usuario
 GROUP BY u.id_usuario, m.tipo_membresia;
 
+SELECT * FROM vista_usuarios_activos;
 
 -- 2. Vista: vista_clases_horarios
 -- Descripción:
@@ -48,6 +88,8 @@ SELECT
 FROM clases c
 INNER JOIN entrenadores e ON c.id_entrenador = e.id_entrenador
 INNER JOIN horarios h ON c.id_clase = h.id_clase;
+
+SELECT * FROM vista_clases_horarios;
 
 -- 3. Vista: vista_reservas_por_usuario
 -- Descripción:
@@ -78,6 +120,8 @@ INNER JOIN usuarios u ON r.id_usuario = u.id_usuario
 INNER JOIN horarios h ON r.id_horario = h.id_horario
 INNER JOIN clases c ON h.id_clase = c.id_clase;
 
+SELECT * FROM vista_reservas_por_usuario;
+
 -- 4. Vista: vista_facturacion_mensual
 -- Descripción:
 -- Proporciona un resumen de facturación mensual, mostrando el total recaudado, el número de facturas emitidas y las membresías asociadas.
@@ -102,6 +146,7 @@ INNER JOIN usuarios u ON p.id_usuario = u.id_usuario
 INNER JOIN membresias m ON u.id_membresia = m.id_membresia
 GROUP BY DATE_FORMAT(f.fecha_generacion, '%Y-%m');
 
+SELECT * FROM vista_facturacion_mensual;
 
 -- 5. Vista: vista_uso_membresias
 -- Descripción:
@@ -137,27 +182,23 @@ GROUP BY m.tipo_membresia;
 -- Ayudar a identificar las membresías más populares.
 
 DELIMITER $$
-CREATE FUNCTION cantidad_tipo_membresia_por_usuario()
-RETURNS TABLE(tipo_membresia VARCHAR(50), cantidad_usuarios INT)
-DETERMINISTIC
+
+CREATE PROCEDURE cantidad_tipo_membresia_por_usuario()
 BEGIN
-    RETURN (
-        SELECT 
-            m.tipo_membresia,
-            COUNT(u.id_usuario) AS cantidad_usuarios
-        FROM membresias m
-        LEFT JOIN usuarios u ON m.id_membresia = u.id_membresia
-        GROUP BY m.tipo_membresia
-    );
+    SELECT 
+        m.tipo_membresia,
+        COUNT(u.id_usuario) AS cantidad_usuarios
+    FROM membresias m
+    LEFT JOIN usuarios u ON m.id_membresia = u.id_membresia
+    GROUP BY m.tipo_membresia;
 END$$
 
 DELIMITER ;
 
--- Uso de la Función:
-SELECT * FROM cantidad_tipo_membresia_por_usuario();
+CALL cantidad_tipo_membresia_por_usuario();
 
 --------------------------------------------------------------------------------
-
+((REVISAR DE ACA PARA ABJO PARA TERMINAR LA ENTREGA))
 -- 2. Función: cantidad_pagos_por_cliente
 -- Descripción:
 -- Calcula la cantidad de pagos realizados por cada cliente.
@@ -350,42 +391,4 @@ sp_agregar_reserva:
 -- Objetivo: Proveer un resumen mensual de facturación.
 -- Beneficio: Simplifica la generación de reportes financieros.
 -- Tablas: facturacion, pagos.
-    
-------------------------------------------------------------------------------------
------------------------------- Trigger ---------------------------------------------
 
---Facturacion cuando el cliente ahce el pago.
-DELIMITER $$
-
-CREATE TRIGGER generar_factura
-AFTER INSERT ON pagos
-FOR EACH ROW
-BEGIN
-    DECLARE fecha_inicio DATE;
-    DECLARE fecha_fin DATE;
-
-    -- La membresía dura un mes a partir de la fecha del pago
-    SET fecha_inicio = DATE(NEW.fecha_pago); -- Fecha del pago
-    SET fecha_fin = DATE_ADD(fecha_inicio, INTERVAL 1 MONTH); -- Suma un mes
-
-    -- Inserta la nueva factura en la tabla facturacion
-    INSERT INTO facturacion (id_pago, fecha_inicio, fecha_fin, fecha_generacion)
-    VALUES (NEW.id_pago, fecha_inicio, fecha_fin, CURDATE());
-END$$
-
-DELIMITER ;
-
-
---Registra el historial cuando el cliente hace la reserva
-DELIMITER $$
-
-CREATE TRIGGER registrar_historial_reserva
-AFTER INSERT ON reservas
-FOR EACH ROW
-BEGIN
-    -- Inserta automáticamente en historial_reservas usando los datos de la nueva reserva
-    INSERT INTO historial_reservas (id_usuario, id_horario, fecha_reserva)
-    VALUES (NEW.id_usuario, NEW.id_horario, NEW.fecha_reserva);
-END$$
-
-DELIMITER ;
