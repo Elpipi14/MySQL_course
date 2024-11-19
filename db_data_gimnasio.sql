@@ -63,6 +63,8 @@ VALUES
 (5, 'Jueves', '19:00:00', '20:00:00'),
 (5, 'Domingo', '10:00:00', '11:00:00');
 
+--(insertar reservas y pagos despues de aplicar los triggers haci se acutualiza sus historiales)----
+
 -- Inserción de datos en la tabla Reservas
 INSERT INTO reservas (id_horario, id_usuario, fecha_reserva, fecha_clase)
 VALUES
