@@ -1,4 +1,4 @@
-    ------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
 ------------------------------ Trigger ---------------------------------------------
 
 --Facturacion cuando el cliente ahce el pago.
@@ -64,6 +64,8 @@ GROUP BY u.id_usuario, m.tipo_membresia;
 
 SELECT * FROM vista_usuarios_activos;
 
+-----------------------------------------------------------
+
 -- 2. Vista: vista_clases_horarios
 -- Descripción:
 -- Muestra las clases programadas junto con sus horarios, los entrenadores responsables y las descripciones de las clases.
@@ -90,6 +92,8 @@ INNER JOIN entrenadores e ON c.id_entrenador = e.id_entrenador
 INNER JOIN horarios h ON c.id_clase = h.id_clase;
 
 SELECT * FROM vista_clases_horarios;
+
+-----------------------------------------------------------
 
 -- 3. Vista: vista_reservas_por_usuario
 -- Descripción:
@@ -122,6 +126,7 @@ INNER JOIN clases c ON h.id_clase = c.id_clase;
 
 SELECT * FROM vista_reservas_por_usuario;
 
+-----------------------------------------------------------
 -- 4. Vista: vista_facturacion_mensual
 -- Descripción:
 -- Proporciona un resumen de facturación mensual, mostrando el total recaudado, el número de facturas emitidas y las membresías asociadas.
@@ -147,6 +152,8 @@ INNER JOIN membresias m ON u.id_membresia = m.id_membresia
 GROUP BY DATE_FORMAT(f.fecha_generacion, '%Y-%m');
 
 SELECT * FROM vista_facturacion_mensual;
+
+-----------------------------------------------------------
 
 -- 5. Vista: vista_uso_membresias
 -- Descripción:
@@ -375,8 +382,7 @@ CALL sp_reporte_facturacion_mensual();
 Resumen de Stored Procedures
 sp_agregar_reserva:
 
-------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------
+------------------   Resumen de los Stored Procedure   ---------------------------
 
 -- Objetivo: Insertar una nueva reserva y actualizar el historial de reservas.
 -- Beneficio: Automatiza el proceso de reservas, reduciendo errores.
