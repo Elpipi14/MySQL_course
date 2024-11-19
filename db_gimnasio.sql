@@ -10,9 +10,9 @@ USE db_gimnasio;
 -- Tabla Membresías
 CREATE TABLE membresias (
     id_membresia INT PRIMARY KEY AUTO_INCREMENT,   -- Identificador único de la membresía
-    tipo_membresia VARCHAR(30) NOT NULL UNIQUE,    -- Nombre de la membresía (más corto)
+    tipo_membresia VARCHAR(30) NOT NULL UNIQUE,    -- Nombre de la membresía 
     precio DECIMAL(10, 2) NOT NULL,                -- Precio de la membresía
-    clases_por_semana INT NOT NULL                 -- Número de clases permitidas por semana (sin coma)
+    clases_por_semana INT NOT NULL                 -- Número de clases permitidas por semana
 );
 
 -- Tabla Usuarios
